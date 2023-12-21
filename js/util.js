@@ -17,5 +17,9 @@ const getUniqNumber = (min, max, array) => {
   return currentValue;
 };
 
+const pressEscape = (evt) => evt.key === 'Escape';
+
 export {getUniqNumber};
 export {getRandomInteger};
+export {pressEscape};
+

@@ -1,77 +1,51 @@
-const fullPictureContainer = document.querySelector('.big-picture');
-const pictureCommentsContainer = fullPictureContainer.querySelector('.social__comments');
-const commentTemplate = pictureCommentsContainer.children[0];
-const closeButton = fullPictureContainer.querySelector('#picture-cancel');
-const commentCount = fullPictureContainer.querySelector('.social__comment-count');
-const commentsLoader = fullPictureContainer.querySelector('.comments-loader');
+import { setComments } from './comment.js';
+import { pressEscape } from './util.js';
+const bigPicture = document.querySelector('.big-picture');
 
-let displayedComments = 5;
+// Получаем ссылку на кнопку закрытия большого изображения
+const closeButton = bigPicture.querySelector('#picture-cancel');
 
-const createCommentElement = (comment) => {
-  const newCommentElement = commentTemplate.cloneNode(true);
-  const newCommentImg = newCommentElement.querySelector('.social__picture');
-
-  newCommentImg.src = comment.avatar;
-  newCommentImg.alt = comment.name;
-  newCommentElement.querySelector('.social__text').textContent = comment.message;
-
-  return newCommentElement;
+// Функция для скрытия большого изображения и восстановления обычного состояния страницы
+const clearBigPictureMenu = () => {
+  bigPicture.classList.add('hidden');
+  document.querySelector('body').classList.remove('modal-open');
 };
 
-const renderComments = (comments) => {
-  pictureCommentsContainer.innerHTML = '';
-
-  comments.slice(0, displayedComments).forEach((comment) => {
-    pictureCommentsContainer.appendChild(createCommentElement(comment));
-  });
-  commentCount.textContent = `${displayedComments} из ${comments.length} комментариев`;
-};
-
-const handleLoadMoreComments = () => {
-  displayedComments += 5;
-
-  renderComments(imageData.comments);
-
-  if (displayedComments >= imageData.comments.length) {
-    commentsLoader.classList.add('hidden');
+// Функция-обработчик для события нажатия клавиши Escape
+const onEscapeKeyDown = (evt) => {
+  if (pressEscape(evt)) {
+    clearBigPictureMenu();
+    document.removeEventListener('keydown', onEscapeKeyDown);
   }
 };
 
-const handlePictureClick = (thumbnail, imageData) => {
-  thumbnail.addEventListener('click', () => {
-    fullPictureContainer.classList.remove('hidden');
-
-    fullPictureContainer.querySelector('.big-picture__img img').src = imageData.url;
-    fullPictureContainer.querySelector('.likes-count').textContent = imageData.likes;
-    fullPictureContainer.querySelector('.comments-count').textContent = imageData.comments.length;
-    fullPictureContainer.querySelector('.social__caption').textContent = imageData.description;
-
-
-    commentCount.classList.remove('hidden');
-    commentsLoader.classList.remove('hidden');
-    renderComments(imageData.comments);
-
-    fullPictureContainer.querySelector('.social__comment-count').classList.add('hidden');
-    document.body.classList.add('modal-open');
-  });
-};
-
-const handleEscapeKey = (evt) => {
-  if (evt.key === 'Escape') {
-    fullPictureContainer.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-    document.removeEventListener('keydown', handleEscapeKey);
-  }
-};
-
+// Обработчик события для кнопки закрытия большого изображения
 closeButton.addEventListener('click', () => {
-  fullPictureContainer.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  document.removeEventListener('keydown', handleEscapeKey);
+  clearBigPictureMenu();
+  document.removeEventListener('keydown', onEscapeKeyDown);
 });
 
-commentsLoader.addEventListener('click', handleLoadMoreComments);
+// Функция для добавления события открытия большого изображения к маленькому изображению
+const pictureClick = (picture, data) => {
+  picture.addEventListener('click', () => {
+    // Добавляем обработчик для события нажатия клавиши Escape
+    document.addEventListener('keydown', onEscapeKeyDown);
 
-document.addEventListener('keydown', handleEscapeKey);
+    // Показываем большое изображение
+    bigPicture.classList.remove('hidden');
 
-export { handlePictureClick };
+    // Заполняем информацию в большом изображении
+    bigPicture.querySelector('.big-picture__img img').src = data.url;
+    bigPicture.querySelector('.likes-count').textContent = data.likes;
+    bigPicture.querySelector('.social__caption').textContent = data.description;
+
+    // Устанавливаем комментарии
+    setComments(data.comments);
+
+    // Добавляем класс для запрета прокрутки страницы при открытом модальном окне
+    document.querySelector('body').classList.add('modal-open');
+  });
+};
+
+// Экспортируем функцию добавления события открытия большого изображения
+export { pictureClick };
