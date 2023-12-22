@@ -1,6 +1,8 @@
 import {closeForm, onEscapeKeyDown} from './upload-form.js';
 import {pressEscape} from './util.js';
 
+const MESSAGE_Z_POSITION = 100;
+
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const successMessage = successTemplate.cloneNode(true);
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -20,12 +22,14 @@ const onSuccessClick = (evt) => {
 
 const closeErrorMessage = () => {
   closeMessage(errorMessage);
+
   document.addEventListener('keydown', onEscapeKeyDown);
 };
 
 const onErrorEscapeDown = (evt) => {
   if(pressEscape(evt)) {
     document.removeEventListener('keydown', onErrorEscapeDown);
+
     closeErrorMessage();
   }
 };
@@ -33,13 +37,15 @@ const onErrorEscapeDown = (evt) => {
 const onErrorClick = (evt) => {
   if(checkElementTarget(evt, 'error__button', 'error__inner')) {
     document.removeEventListener('keydown', onErrorEscapeDown);
+
     closeErrorMessage();
   }
 };
 
 const appendMessage = (message) => {
   message.classList.add('hidden');
-  message.style.zIndex = '100';
+  message.style.zIndex = MESSAGE_Z_POSITION;
+
   document.body.appendChild(message);
 };
 
@@ -50,13 +56,16 @@ const addPostMessages = () => {
 
 const showSuccessMessage = () => {
   successMessage.classList.remove('hidden');
+
   successMessage.addEventListener('click', onSuccessClick, {once: true});
 };
 
 const showErrorMessage = () => {
   document.removeEventListener('keydown', onEscapeKeyDown);
   document.addEventListener('keydown', onErrorEscapeDown);
+
   errorMessage.classList.remove('hidden');
+
   errorMessage.addEventListener('click', onErrorClick, {once: true});
 };
 

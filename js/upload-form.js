@@ -1,71 +1,62 @@
-import { setupHashtagInput, clearHashtagsField, checkFormValidation} from './hashtag.js';
-import { pressEscape } from './util.js';
-import { setInitialScale} from './scaler.js';
-import { setEffects } from './effects.js';
-import {setData} from './connect-server.js';
-import {addPostMessages, showSuccessMessage, closeMessage, showErrorMessage} from './post-message.js';
+import {uploadHashtagInput, clearHashtagsField, checkFormValidation} from './hashtag.js';
+import {pressEscape} from './util.js';
+import {setScale} from './scaler.js';
+import {setEffects} from './effects.js';
+import {setData} from './api.js';
+import {addPostMessages, showSuccessMessage, closeMessage, showErrorMessage} from './message.js';
 
 const form = document.querySelector('.img-upload__form');
-const fileInput = document.querySelector('#upload-file');
-const overlayElement = document.querySelector('.img-upload__overlay');
-const closeUploadButton = document.querySelector('#upload-cancel');
 
-// Получаем ссылки на элементы формы загрузки
-const commentsTextArea = overlayElement.querySelector('.text__description');
-const submitButton = overlayElement.querySelector('#upload-submit');
+const uploadingControl = form.querySelector('#upload-file');
+const uploadingOverlay = form.querySelector('.img-upload__overlay');
+const uploadingClose = form.querySelector('#upload-cancel');
 
-// Функция для очистки формы после загрузки
-const clearUploadForm = () => {
-  overlayElement.classList.add('hidden');
-  document.body.classList.remove('modal-open');
+const uploadingComments = uploadingOverlay.querySelector('.text__description');
+const uploadingButton = uploadingOverlay.querySelector('#upload-submit');
 
-  fileInput.value = '';
+const clearForm = () => {
+  uploadingOverlay.classList.add('hidden');
+  document.querySelector('body').classList.remove('modal-open');
+
+  uploadingControl.value = '';
   clearHashtagsField();
-  commentsTextArea.value = '';
+  uploadingComments.value = '';
+
   closeMessage();
 
-  submitButton.disabled = false;
+  uploadingButton.disabled = false;
 };
 
-// Обработчик нажатия клавиши Escape
 const onEscapeKeyDown = (evt) => {
-  // Проверяем, что нажата клавиша Escape и не происходит ввод в полях ввода
-  if (pressEscape(evt) && !evt.target.classList.contains('text__hashtags') && !evt.target.classList.contains('text__description')) {
-    // Очищаем форму
-    clearUploadForm();
+  if(pressEscape(evt) && !evt.target.classList.contains('text__hashtags') && !evt.target.classList.contains('text__description')) {
+    clearForm();
 
     document.removeEventListener('keydown', onEscapeKeyDown);
   }
 };
 
-// Добавляем обработчик события для кнопки закрытия
-closeUploadButton.addEventListener('click', () => {
-  // Очищаем форму
-  clearUploadForm();
+const closeForm = () => {
+  clearForm();
 
   document.removeEventListener('keydown', onEscapeKeyDown);
-});
-
-// Обработчик события при клике на кнопку загрузки
-const onUploadClick = () => {
-  // Добавляем обработчик для события нажатия клавиши Escape
-  document.addEventListener('keydown', onEscapeKeyDown);
-
-  // Показываем оверлей
-  overlayElement.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-
-  // Устанавливаем начальные значения масштаба и эффектов
-  setInitialScale();
-  setEffects();
-
-  // Добавляем обработчик для ввода хэштегов
-  setupHashtagInput();
 };
 
-// Добавляем обработчик события для поля выбора файла
+uploadingClose.addEventListener('click', closeForm);
+
+const onUploadClick = () => {
+  document.addEventListener('keydown', onEscapeKeyDown);
+
+  uploadingOverlay.classList.remove('hidden');
+  document.querySelector('body').classList.add('modal-open');
+
+  setScale();
+  setEffects();
+
+  uploadHashtagInput();
+};
+
 const uploadForm = () => {
-  fileInput.addEventListener('change', onUploadClick);
+  uploadingControl.addEventListener('change', onUploadClick);
   addPostMessages();
 };
 
@@ -79,5 +70,5 @@ const onFormSubmit = (evt) => {
 
 form.addEventListener('submit', onFormSubmit);
 
-// Экспортируем функцию установки формы загрузки
-export { uploadForm, closeUploadButton, onEscapeKeyDown};
+export{uploadForm, closeForm, onEscapeKeyDown};
+

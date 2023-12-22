@@ -1,32 +1,29 @@
-import { pictureClick } from './big-picture.js';
+import { showBigPicture } from './big-pictures.js';
 
-const picturesContainer = document.querySelector('.pictures');
-const createPicture = document.querySelector('#picture').content;
-const picturesFragment = document.createDocumentFragment();
+const container = document.querySelector('.pictures');
+const template = document.querySelector('#picture').content.querySelector('.picture');
 
-const renderPicture = (picture) => {
+const fragment = document.createDocumentFragment();
 
-  const pictureElement = createPicture.cloneNode(true);
-  pictureElement.querySelector('.picture__likes').textContent = picture.likes;
-  pictureElement.querySelector('.picture__comments').textContent = picture.comments.length;
-  pictureElement.querySelector('.picture__img').alt=picture.description;
-  pictureElement.querySelector('.picture__img').src = picture.url;
-
-  pictureElement.addEventListener('click', (evt) => {
-    evt.preventDefault();
-
-    pictureClick(picture);
+// функция создающая один фрагмент фотографии
+const createUserPhoto = (picture) => {
+  const element = template.cloneNode(true);
+  element.querySelector('.picture__img').src = picture.url;
+  element.querySelector('.picture__likes').textContent = picture.likes;
+  element.querySelector('.picture__comments').textContent = picture.comments.length;
+  element.addEventListener('click', () => {
+    showBigPicture(picture);
   });
-
-  return pictureElement;
+  fragment.appendChild(element);
 };
 
-const renderPictures = (images) => {
-  images.forEach((picture) => {
-    picturesFragment.appendChild(renderPicture(picture));
+// здесь создаются все 25
+const renderUserPhotos = (pictures) => {
+  pictures.forEach((picture) => {
+    createUserPhoto(picture);
   });
-
-  picturesContainer.appendChild(picturesFragment);
+  return container.appendChild(fragment);
 };
 
-export { renderPictures };
+
+export {renderUserPhotos};

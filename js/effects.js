@@ -1,10 +1,8 @@
-// Константы для установки максимальных значений эффектов
 const MAX_MARVIN_VALUE = 100;
 const MAX_PHOBOS_VALUE = 3;
 const MAX_HEAT_VALUE = 3;
 const RELIX = 10;
 
-// Объект Slider с параметрами для noUiSlider
 const Slider = {
   MIN: 0,
   MAX: 100,
@@ -12,9 +10,8 @@ const Slider = {
   CONNECT: 'lower'
 };
 
-// Получаем ссылки на элементы DOM
 const uploadingOverlay = document.querySelector('.img-upload__overlay');
-const uploadingPicture = uploadingOverlay.querySelector('.img-upload__preview img');
+const uploadingPicture = uploadingOverlay.querySelector('.img-upload__preview').querySelector('img');
 const sliderValue = uploadingOverlay.querySelector('.effect-level__value');
 const sliderItem = uploadingOverlay.querySelector('.effect-level__slider');
 const sliderField = uploadingOverlay.querySelector('.img-upload__effect-level');
@@ -22,7 +19,6 @@ const effectsList = uploadingOverlay.querySelector('.effects__list');
 
 let currentEffect = '';
 
-// Создаем noUiSlider
 noUiSlider.create(sliderItem, {
   range: {
     min: Slider.MIN,
@@ -33,10 +29,8 @@ noUiSlider.create(sliderItem, {
   connect: Slider.CONNECT
 });
 
-// Функция для расчета значения шага эффекта
 const getEffectStep = (effectMaxValue) => effectMaxValue / Slider.MAX;
 
-// Объект с функциями для каждого эффекта
 const effects = {
   none: () => {
     sliderField.classList.add('hidden');
@@ -65,22 +59,21 @@ const effects = {
   }
 };
 
-// Обработчик изменения значения на слайдере
 const onSliderChange = () => {
   sliderValue.value = sliderItem.noUiSlider.get();
+
   uploadingPicture.style.filter = effects[currentEffect.replace('effects__preview--', '')]();
 };
 
-// Обработчик клика по эффектам
 const onEffectsClick = (evt) => {
   let element = evt.target;
 
-  if (element.classList.contains('effects__label')) {
+  if(element.classList.contains('effects__label')){
     element = element.querySelector('span');
   }
 
-  if (element.classList.contains('effects__preview')) {
-    if (currentEffect !== '') {
+  if(element.classList.contains('effects__preview')) {
+    if(currentEffect !== '') {
       uploadingPicture.classList.remove(currentEffect);
     }
 
@@ -93,15 +86,15 @@ const onEffectsClick = (evt) => {
   }
 };
 
-// Функция для установки начальных эффектов
 const setEffects = () => {
   currentEffect = 'effects__preview--none';
+
   uploadingPicture.style.filter = effects.none();
+
+  effectsList.children[0].querySelector('input').checked = true;
 };
 
-// Добавляем обработчики событий
 sliderItem.noUiSlider.on('change', onSliderChange);
 effectsList.addEventListener('click', onEffectsClick);
 
-// Экспортируем функцию установки эффектов
-export { setEffects };
+export{setEffects};

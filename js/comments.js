@@ -1,70 +1,59 @@
-// Задаем максимальное количество новых комментариев для загрузки
-const MAX_NEW_COMMENTS = 5;
+const MAX_NEW_COMMENTS_COUNT = 5;
 
-// Получаем элементы интерфейса
-const imageContainer = document.querySelector('.big-picture');
-const loadMoreButton = imageContainer.querySelector('.comments-loader');
-const commentCountPicture = imageContainer.querySelector('.social__comment-count');
-const commentsContainer = imageContainer.querySelector('.social__comments');
-const commentTemplate = commentsContainer.children[0].cloneNode(true);
+const bigPicture = document.querySelector('.big-picture');
+const loadingButton = bigPicture.querySelector('.comments-loader');
+const commentsCountItem = bigPicture.querySelector('.social__comment-count');
+const pictureComments = bigPicture.querySelector('.social__comments');
+const commentChild = pictureComments.children[0];
 
-// Инициализируем счетчик комментариев
-let commentsMultiplier = 1;
+let maxCommentsMultiplyer = 1;
 
-// Функция для создания элемента комментария на основе шаблона
-const createCommentElement = (commentData) => {
-  const commentElement = commentTemplate.cloneNode(true);
-  const commentImage = commentElement.querySelector('.social__picture');
+const getCommentItem = (comment) => {
+  const newComment = commentChild.cloneNode(true);
+  const newCommentImg = newComment.querySelector('.social__picture');
 
-  // Заполняем данные комментария
-  commentImage.src = commentData.avatar;
-  commentImage.alt = commentData.name;
-  commentElement.querySelector('.social__text').textContent = commentData.message;
+  newCommentImg.src = comment.avatar;
+  newCommentImg.alt = comment.name;
 
-  // Скрываем комментарий по умолчанию
-  commentElement.classList.add('hidden');
+  newComment.querySelector('.social__text').textContent = comment.message;
 
-  return commentElement;
+  newComment.classList.add('hidden');
+
+  return newComment;
 };
 
-// Функция для добавления новых комментариев
 const addNewComments = () => {
-  const newCommentsCount = MAX_NEW_COMMENTS * commentsMultiplier;
-  const totalCommentsCount = commentsContainer.children.length;
-  const addedCommentsCount = Math.min(newCommentsCount, totalCommentsCount);
+  const newCommentsCount = MAX_NEW_COMMENTS_COUNT * maxCommentsMultiplyer;
+  const commentsOverallCount = pictureComments.children.length;
+  const addedCommentsCount = newCommentsCount >= commentsOverallCount ? commentsOverallCount : newCommentsCount;
 
-  // Показываем добавленные комментарии
-  for (let i = 0; i < addedCommentsCount; i++) {
-    if (i < newCommentsCount && i >= newCommentsCount - MAX_NEW_COMMENTS) {
-      commentCountPicture.children[i].classList.remove('hidden');
+  for(let i = 0; i < addedCommentsCount; i++) {
+    if (i < newCommentsCount && i >= newCommentsCount - MAX_NEW_COMMENTS_COUNT) {
+      pictureComments.children[i].classList.remove('hidden');
     }
   }
 
-  // Показываем или скрываем кнопку загрузки в зависимости от количества комментариев
-  loadMoreButton.classList.toggle('hidden', totalCommentsCount <= newCommentsCount);
+  if(commentsOverallCount > newCommentsCount) {
+    loadingButton.classList.remove('hidden');
+  }
+  else{
+    loadingButton.classList.add('hidden');
+  }
 
-  // Обновляем отображение количества комментариев
-  commentCountPicture.innerHTML = `${addedCommentsCount} из <span class="comments-count">${totalCommentsCount}</span> комментариев`;
+  commentsCountItem.innerHTML = `${addedCommentsCount} из <span class="comments-count">${commentsOverallCount}</span> комментариев`;
 };
 
-// Функция для установки комментариев на изображение
-const setComments = (commentsData) => {
-  commentsContainer.innerHTML = '';
-
-  // Создаем и добавляем элементы комментариев
-  commentsData.forEach((commentData) => {
-    commentsContainer.appendChild(createCommentElement(commentData));
+const setComments = (comments) => {
+  pictureComments.innerHTML = '';
+  comments.forEach((comment) => {
+    pictureComments.appendChild(getCommentItem(comment));
   });
-  // Сбрасываем счетчик и отображаем начальное количество комментариев
-  commentsMultiplier = 1;
+  maxCommentsMultiplyer = 1;
   addNewComments();
 };
 
-// Обработчик события для кнопки загрузки комментариев
-loadMoreButton.addEventListener('click', () => {
-  commentsMultiplier++;
-  addNewComments();
+loadingButton.addEventListener('click', () => {
+  addNewComments(maxCommentsMultiplyer++);
 });
 
-// Экспортируем функцию установки комментариев
-export {setComments};
+export { setComments };
