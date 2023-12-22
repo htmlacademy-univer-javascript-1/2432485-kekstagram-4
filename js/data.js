@@ -13,7 +13,7 @@ const NAMES = [
   'Екатерина',
   'Татьяна'
 ];
-const MESSAGE = [
+const MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -29,22 +29,23 @@ const DESCRIPTIONS = [
   'Ну это уж совсем не доказательство…'
 ];
 
-const getComments = () => ({
+
+const CreateComment = () => ({
   id: getUniqNumber(usersId),
-  avatar:`img/avatar-${getRandomInteger(1, 6)}.svg`,
-  message: MESSAGE[getRandomInteger(0, 5)],
-  name: NAMES[getRandomInteger(0, 5)]
+  avatar: `img/avatar-${ getRandomInteger(1, 6) }.svg`,
+  message: MESSAGES[getRandomInteger(0, 1)],
+  name: NAMES[getRandomInteger(0,NAMES.length-1)]
 });
-const getPhoto= () => ({
+
+const CreatePhoto = () => ({
   id: photosId[getRandomInteger(1,COUNT_PHOTO-1)],
   url: `photos/${getRandomInteger(1,COUNT_PHOTO-1)}.jpg`,
   description: DESCRIPTIONS[getRandomInteger(0, DESCRIPTIONS.length-1)],
-  likes: getRandomInteger(15, 200),
-  comments: Array.from({length: getRandomInteger(1, COUNT_COMMENT) },getComments)
+  likes:getRandomInteger(15, 200),
+  comments: Array.from({length: getRandomInteger(1, COUNT_COMMENT) }, CreateComment)
 });
 
-const getPosts = () => {
-  Array.from({length: COUNT_PHOTO}, getPhoto);
-};
+const getPosts = () => Array.from({length: COUNT_PHOTO}, CreatePhoto);
 
 export {getPosts};
+

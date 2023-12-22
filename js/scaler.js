@@ -1,54 +1,42 @@
 const SCALE_STEP = 25;
+const MIN_SCALER_VALUE = 25;
+const MAX_SCALER_VALUE = 100;
 
-// Минимальное и максимальное значение масштаба
-const MIN_SCALE_VALUE = 25;
-const MAX_SCALE_VALUE = 100;
+const uploadingOverlay = document.querySelector('.img-upload__overlay');
+const uploadingPicture = uploadingOverlay.querySelector('.img-upload__preview').querySelector('img');
+const scale = uploadingOverlay.querySelector('.img-upload__scale');
+const scalerField = scale.querySelector('.scale__control--value');
 
-// Получаем ссылки на элементы DOM
-const overlayElement = document.querySelector('.img-upload__overlay');
-const pictureElement = overlayElement.querySelector('.img-upload__preview img');
-const scaleElement = overlayElement.querySelector('.img-upload__scale');
-const scalerValueElement = scaleElement.querySelector('.scale__control--value');
-
-// Функция для изменения масштаба изображения
 const changeScale = (scaleCoefficient) => {
-  let currentScale = Number(scalerValueElement.value.replace('%', '')) + scaleCoefficient * SCALE_STEP;
+  let scaleNumber = Number(scalerField.value.replace('%', '')) + scaleCoefficient * SCALE_STEP;
 
-  // Проверка на минимальное и максимальное значения масштаба
-  if (currentScale < MIN_SCALE_VALUE) {
-    currentScale = MIN_SCALE_VALUE;
-  } else if (currentScale > MAX_SCALE_VALUE) {
-    currentScale = MAX_SCALE_VALUE;
+  if(scaleNumber < MIN_SCALER_VALUE) {
+    scaleNumber = MIN_SCALER_VALUE;
+  }
+  else if (scaleNumber > MAX_SCALER_VALUE) {
+    scaleNumber = MAX_SCALER_VALUE;
   }
 
-  // Устанавливаем новое значение масштаба
-  scalerValueElement.value = `${currentScale}%`;
-  pictureElement.style.transform = `scale(${currentScale / 100})`;
+  scalerField.value = `${scaleNumber}%`;
+  uploadingPicture.style.transform = `scale(${scaleNumber / 100})`;
 };
 
-// Обработчик клика по кнопкам изменения масштаба
 const onScaleButtonClick = (evt) => {
-  if (evt.target.matches('button')) {
+  if(evt.target.matches('button')) {
     let coefficient = 1;
-
-    // Определяем коэффициент в зависимости от нажатой кнопки
-    if (evt.target.matches('.scale__control--smaller')) {
+    if(evt.target.matches('.scale__control--smaller')) {
       coefficient = -1;
     }
 
-    // Изменяем масштаб
     changeScale(coefficient);
   }
 };
 
-// Функция для установки начального значения масштаба
-const setInitialScale = () => {
-  scalerValueElement.value = `${MAX_SCALE_VALUE}%`;
-  pictureElement.style.transform = `scale(${MAX_SCALE_VALUE / 100})`;
+const setScale = () => {
+  scalerField.value = `${MAX_SCALER_VALUE}%`;
+  uploadingPicture.style.transform = `scale(${MAX_SCALER_VALUE / 100})`;
 };
 
-// Добавляем обработчик события для кнопок изменения масштаба
-scaleElement.addEventListener('click', onScaleButtonClick);
+scale.addEventListener('click', onScaleButtonClick);
 
-// Экспортируем функцию установки начального значения масштаба
-export { setInitialScale };
+export{setScale};

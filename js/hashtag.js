@@ -1,16 +1,12 @@
-// Максимальное количество хэштегов и их длина
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_HASHTAGS_LENGTH = 20;
 
-// Получаем ссылку на форму
-const uploadForm = document.querySelector('.img-upload__form');
+const form = document.querySelector('.img-upload__form');
 
-// Получаем ссылки на элементы формы
-const hashtagInputField = uploadForm.querySelector('.text__hashtags');
-const submitButton = uploadForm.querySelector('#upload-submit');
+const inputHashtag = form.querySelector('.text__hashtags');
+const submitButton = form.querySelector('#upload-submit');
 
-// Инициализация библиотеки для валидации формы
-const pristine = new Pristine(uploadForm, {
+const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload__item--invalid',
   successClass: 'img-upload__item--valid',
@@ -19,31 +15,23 @@ const pristine = new Pristine(uploadForm, {
   errorTextClass: 'img-upload__error'
 });
 
-// Сообщение об ошибке
 let errorMessage = '';
 
-// Функция для получения сообщения об ошибке
 const getErrorMessage = () => errorMessage;
 
-// Обработчик валидации для поля хэштега
 const hashtagErrorHandler = (value) => {
   errorMessage = '';
 
   const hashtagInputText = value.toLowerCase().trim();
-
-  // Проверка наличия хотя бы одного хэштега
-  if (hashtagInputText.length === 0) {
+  if(hashtagInputText.length === 0){
     return true;
   }
 
   const hashtagTexts = hashtagInputText.split(/\s+/);
-
-  // Проверка, что хотя бы один хэштег присутствует
-  if (hashtagTexts.length === 0) {
+  if(hashtagTexts.length === 0) {
     return true;
   }
 
-  // Правила валидации для введенных хэштегов
   const inputRules = [
     {
       rule: hashtagTexts.some((text) => text.indexOf('#', 1) > 0),
@@ -75,33 +63,32 @@ const hashtagErrorHandler = (value) => {
     }
   ];
 
-  // Проверяем все правила и формируем сообщение об ошибке
   return inputRules.every((inputRule) => {
     const isValid = !inputRule.rule;
-    if (!isValid) {
+    if(!isValid){
       errorMessage = inputRule.error;
     }
     return isValid;
   });
 };
 
-// Добавляем валидатор для поля хэштега
-pristine.addValidator(hashtagInputField, hashtagErrorHandler, getErrorMessage, 2, false);
+pristine.addValidator(inputHashtag, hashtagErrorHandler, getErrorMessage, 2, false);
 
-// Обработчик изменения в поле хэштега
-const onHashtagInputChange = () => {
+const onHashtagInput = () => {
   submitButton.disabled = !pristine.validate();
 };
 
-// Добавляем слушатель события ввода для поля хэштега
-const setupHashtagInput = () => {
-  hashtagInputField.addEventListener('input', onHashtagInputChange);
+const uploadHashtagInput = () => {
+  inputHashtag.addEventListener('input', onHashtagInput);
 };
 
 const checkFormValidation = () => pristine.validate();
+
 const clearHashtagsField = () => {
-  hashtagInputField.value = '';
+  inputHashtag.value = '';
+
   pristine.validate();
 };
 
-export {setupHashtagInput, clearHashtagsField, checkFormValidation};
+export {uploadHashtagInput, clearHashtagsField, checkFormValidation};
+
