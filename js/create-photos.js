@@ -1,9 +1,5 @@
-import {getRandomInteger, getUniqNumber, generateArray} from './util.js';
 
-const COUNT_PHOTO = 25;
-const COUNT_COMMENT = 10;
-const photosId = generateArray(25,25);
-const usersId = generateArray(25,25);
+import { getRandomInteger, getId, createRandomIdFromRangeGenerator, throttle } from './utils.js';
 
 const NAMES = [
   'Андрей',
@@ -30,22 +26,44 @@ const DESCRIPTIONS = [
 ];
 
 
-const CreateComment = () => ({
-  id: getUniqNumber(usersId),
-  avatar: `img/avatar-${ getRandomInteger(1, 6) }.svg`,
-  message: MESSAGES[getRandomInteger(0, 1)],
-  name: NAMES[getRandomInteger(0,NAMES.length-1)]
+const CommentsCount = {
+  MIN: 0,
+  MAX: 30,
+};
+const LikesCount = {
+  MIN: 15,
+  MAX: 200,
+};
+
+const MessagesCount = {
+  MIN: 1,
+  MAX: 2,
+};
+const AvatarId = {
+  MIN: 1,
+  MAX: 6,
+};
+const COUNT_PHOTOS = 25;
+
+const generatePhotoID = createRandomIdFromRangeGenerator(1, COUNT_PHOTOS);
+
+const generateCommentID = getId();
+
+const getComment = (id) => ({
+  id: id,
+  avatar: `img/avatar-${getRandomInteger(AvatarId.MIN, AvatarId.MAX)}.svg`,
+  message: throttle(MESSAGES).slice(0, getRandomInteger(MessagesCount.MIN, MessagesCount.MAX)),
+  name: NAMES[getRandomInteger(0, NAMES.length - 1)],
 });
 
-const CreatePhoto = () => ({
-  id: photosId[getRandomInteger(1,COUNT_PHOTO-1)],
-  url: `photos/${getRandomInteger(1,COUNT_PHOTO-1)}.jpg`,
-  description: DESCRIPTIONS[getRandomInteger(0, DESCRIPTIONS.length-1)],
-  likes:getRandomInteger(15, 200),
-  comments: Array.from({length: getRandomInteger(1, COUNT_COMMENT) }, CreateComment)
+const getPhotoData = (id) => ({
+  id: id,
+  url: `photos/${id}.jpg`,
+  likes: getRandomInteger(LikesCount.MIN, LikesCount.MAX),
+  description: DESCRIPTIONS[getRandomInteger(0, DESCRIPTIONS.length - 1)],
+  comments: Array.from({ length: getRandomInteger(CommentsCount.MIN, CommentsCount.MAX) }, () => getComment(generateCommentID())),
 });
 
-const getPosts = () => Array.from({length: COUNT_PHOTO}, CreatePhoto);
+const getPhotos = () => Array.from({ length: COUNT_PHOTOS }, () => getPhotoData(generatePhotoID()));
 
-export {getPosts};
-
+export { getPhotos };

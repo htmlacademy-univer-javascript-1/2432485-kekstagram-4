@@ -86,7 +86,7 @@ const onEffectsClick = (evt) => {
   }
 };
 
-const setEffects = () => {
+const resetEffects = () => {
   currentEffect = 'effects__preview--none';
 
   uploadingPicture.style.filter = effects.none();
@@ -97,4 +97,4 @@ const setEffects = () => {
 sliderItem.noUiSlider.on('change', onSliderChange);
 effectsList.addEventListener('click', onEffectsClick);
 
-export{setEffects};
+export { resetEffects };
