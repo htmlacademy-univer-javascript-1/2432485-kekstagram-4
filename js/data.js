@@ -1,13 +1,9 @@
-import {getRandomInteger, getUniqNumber} from './util.js';
+import {getRandomInteger, getUniqNumber, generateArray} from './util.js';
 
-const URL = [];
-const PHOTOS = [];
-const COMMENTS = [];
-const MINIMUM_NUMBER_OF_COMMENTS = 1;
-const MAXIMUM_NUMBER_OF_COMMENTS = 30;
-const MINIMUM_NUMBER_OF_LIKES = 15;
-const MAXIMUM_NUMBER_OF_LIKES = 200;
-const NUMBER_OF_POSTS = 25;
+const COUNT_PHOTO = 25;
+const COUNT_COMMENT = 10;
+const photosId = generateArray(25,25);
+const usersId = generateArray(25,25);
 
 const NAMES = [
   'Андрей',
@@ -33,30 +29,22 @@ const DESCRIPTIONS = [
   'Ну это уж совсем не доказательство…'
 ];
 
-const getComments = () => {
-  const comments = [];
-  const numberOfComments = getRandomInteger(MINIMUM_NUMBER_OF_COMMENTS, MAXIMUM_NUMBER_OF_COMMENTS);
-  for (let i=0; i < numberOfComments; i++){
-    comments.push({
-      id: getUniqNumber(1, 100000, COMMENTS),
-      avatar:`img/avatar-${getRandomInteger(1, 6)}.svg`,
-      message: MESSAGE[getRandomInteger(0, 5)],
-      name: NAMES[getRandomInteger(0, 5)]
-    });
-  }
-  return comments;
-};
-
-const getPost= () => ({
-  id: getUniqNumber(1, 25, PHOTOS),
-  url: `photos/${getUniqNumber(1, 25, URL)}.jpg`,
-  description: DESCRIPTIONS[getRandomInteger(0, 4)],
-  likes: getRandomInteger(MINIMUM_NUMBER_OF_LIKES, MAXIMUM_NUMBER_OF_LIKES),
-  comments: getComments()
+const getComments = () => ({
+  id: getUniqNumber(usersId),
+  avatar:`img/avatar-${getRandomInteger(1, 6)}.svg`,
+  message: MESSAGE[getRandomInteger(0, 5)],
+  name: NAMES[getRandomInteger(0, 5)]
+});
+const getPhoto= () => ({
+  id: photosId[getRandomInteger(1,COUNT_PHOTO-1)],
+  url: `photos/${getRandomInteger(1,COUNT_PHOTO-1)}.jpg`,
+  description: DESCRIPTIONS[getRandomInteger(0, DESCRIPTIONS.length-1)],
+  likes: getRandomInteger(15, 200),
+  comments: Array.from({length: getRandomInteger(1, COUNT_COMMENT) },getComments)
 });
 
 const getPosts = () => {
-  Array.from({length: NUMBER_OF_POSTS}, getPost);
+  Array.from({length: COUNT_PHOTO}, getPhoto);
 };
 
 export {getPosts};
