@@ -1,8 +1,11 @@
-import { setupHashtagInput, clearHashtagsField } from './hashtag.js';
+import { setupHashtagInput, clearHashtagsField, checkFormValidation} from './hashtag.js';
 import { pressEscape } from './util.js';
 import { setInitialScale} from './scaler.js';
 import { setEffects } from './effects.js';
+import {setData} from './connect-server.js';
+import {addPostMessages, showSuccessMessage, closeMessage, showErrorMessage} from './post-message.js';
 
+const form = document.querySelector('.img-upload__form');
 const fileInput = document.querySelector('#upload-file');
 const overlayElement = document.querySelector('.img-upload__overlay');
 const closeUploadButton = document.querySelector('#upload-cancel');
@@ -19,6 +22,7 @@ const clearUploadForm = () => {
   fileInput.value = '';
   clearHashtagsField();
   commentsTextArea.value = '';
+  closeMessage();
 
   submitButton.disabled = false;
 };
@@ -62,7 +66,18 @@ const onUploadClick = () => {
 // Добавляем обработчик события для поля выбора файла
 const uploadForm = () => {
   fileInput.addEventListener('change', onUploadClick);
+  addPostMessages();
 };
 
+const onFormSubmit = (evt) => {
+  evt.preventDefault();
+
+  if(checkFormValidation()) {
+    setData(showSuccessMessage, showErrorMessage, 'POST', new FormData(form));
+  }
+};
+
+form.addEventListener('submit', onFormSubmit);
+
 // Экспортируем функцию установки формы загрузки
-export { uploadForm };
+export { uploadForm, closeUploadButton, onEscapeKeyDown};

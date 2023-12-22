@@ -1,8 +1,9 @@
-import {getPosts} from './data.js';
+import {getData} from './api.js';
 import { renderPictures } from './pictures.js';
 import {uploadForm} from './upload-form.js';
 
-const picturesArray = getPosts();
-renderPictures(picturesArray);
+getData((pictures) => {
+  renderPictures(pictures);
+});
 
 uploadForm();

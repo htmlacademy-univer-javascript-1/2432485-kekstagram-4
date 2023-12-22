@@ -98,21 +98,10 @@ const setupHashtagInput = () => {
   hashtagInputField.addEventListener('input', onHashtagInputChange);
 };
 
-// Обработчик отправки формы
-uploadForm.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-
-  // Проводим валидацию перед отправкой формы
-  pristine.validate();
-});
-
-// Функция для очистки поля хэштега
+const checkFormValidation = () => pristine.validate();
 const clearHashtagsField = () => {
   hashtagInputField.value = '';
-
-  // Проводим валидацию после очистки поля
   pristine.validate();
 };
 
-// Экспортируем функции
-export { setupHashtagInput, clearHashtagsField };
+export {setupHashtagInput, clearHashtagsField, checkFormValidation};

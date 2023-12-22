@@ -12,7 +12,11 @@ const renderPicture = (picture) => {
   pictureElement.querySelector('.picture__img').alt=picture.description;
   pictureElement.querySelector('.picture__img').src = picture.url;
 
-  pictureClick(pictureElement, picture);
+  pictureElement.addEventListener('click', (evt) => {
+    evt.preventDefault();
+
+    pictureClick(picture);
+  });
 
   return pictureElement;
 };

@@ -1,5 +1,6 @@
 import { setComments } from './comment.js';
 import { pressEscape } from './util.js';
+
 const bigPicture = document.querySelector('.big-picture');
 
 // Получаем ссылку на кнопку закрытия большого изображения
@@ -26,25 +27,24 @@ closeButton.addEventListener('click', () => {
 });
 
 // Функция для добавления события открытия большого изображения к маленькому изображению
-const pictureClick = (picture, data) => {
-  picture.addEventListener('click', () => {
-    // Добавляем обработчик для события нажатия клавиши Escape
-    document.addEventListener('keydown', onEscapeKeyDown);
+const pictureClick = (data) => {
+  document.addEventListener('keydown', onEscapeKeyDown);
 
-    // Показываем большое изображение
-    bigPicture.classList.remove('hidden');
 
-    // Заполняем информацию в большом изображении
-    bigPicture.querySelector('.big-picture__img img').src = data.url;
-    bigPicture.querySelector('.likes-count').textContent = data.likes;
-    bigPicture.querySelector('.social__caption').textContent = data.description;
+  // Показываем большое изображение
+  bigPicture.classList.remove('hidden');
 
-    // Устанавливаем комментарии
-    setComments(data.comments);
+  // Заполняем информацию в большом изображении
+  bigPicture.querySelector('.big-picture__img img').src = data.url;
+  bigPicture.querySelector('.likes-count').textContent = data.likes;
+  bigPicture.querySelector('.social__caption').textContent = data.description;
 
-    // Добавляем класс для запрета прокрутки страницы при открытом модальном окне
-    document.querySelector('body').classList.add('modal-open');
-  });
+  // Устанавливаем комментарии
+  setComments(data.comments);
+
+  // Добавляем класс для запрета прокрутки страницы при открытом модальном окне
+  document.querySelector('body').classList.add('modal-open');
+
 };
 
 // Экспортируем функцию добавления события открытия большого изображения
