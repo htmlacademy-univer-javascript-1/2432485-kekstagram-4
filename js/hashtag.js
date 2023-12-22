@@ -10,7 +10,7 @@ const hashtagInputField = uploadForm.querySelector('.text__hashtags');
 const submitButton = uploadForm.querySelector('#upload-submit');
 
 // Инициализация библиотеки для валидации формы
-const formValidator = new Pristine(uploadForm, {
+const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload__item--invalid',
   successClass: 'img-upload__item--valid',
@@ -86,11 +86,11 @@ const hashtagErrorHandler = (value) => {
 };
 
 // Добавляем валидатор для поля хэштега
-formValidator.addValidator(hashtagInputField, hashtagErrorHandler, getErrorMessage, 2, false);
+pristine.addValidator(hashtagInputField, hashtagErrorHandler, getErrorMessage, 2, false);
 
 // Обработчик изменения в поле хэштега
 const onHashtagInputChange = () => {
-  submitButton.disabled = !formValidator.validate();
+  submitButton.disabled = !pristine.validate();
 };
 
 // Добавляем слушатель события ввода для поля хэштега
@@ -103,7 +103,7 @@ uploadForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
   // Проводим валидацию перед отправкой формы
-  formValidator.validate();
+  pristine.validate();
 });
 
 // Функция для очистки поля хэштега
@@ -111,7 +111,7 @@ const clearHashtagsField = () => {
   hashtagInputField.value = '';
 
   // Проводим валидацию после очистки поля
-  formValidator.validate();
+  pristine.validate();
 };
 
 // Экспортируем функции

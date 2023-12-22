@@ -1,25 +1,21 @@
-const getRandomInteger = (a, b) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
-};
+function getRandomInteger(intFrom, intTo){
+  if (intFrom > intTo || intFrom < 0 || intTo < 0 ){
+    return  new Error('Error. Change input values');
+  }
+  return Math.round(intFrom - 0.5 + Math.random(intFrom, intTo) * (1 + intTo - intFrom));
+}
 
-const getUniqNumber = (min, max, array) => {
-  let currentValue = getRandomInteger(min, max);
-  if (array.length >= (max - min + 1)) {
-    return null;
-  }
-  while (array.includes(currentValue)) {
-    currentValue = getRandomInteger(min, max);
-  }
-  array.push(currentValue);
-  return currentValue;
-};
+const generateArray = (length, max) => (
+  [...new Array(length)].map(() => Math.round(Math.random() * max)));
+
+function getUniqNumber (usersId) {
+  const temp = usersId[getRandomInteger(0,usersId.length-1)];
+
+  delete(usersId[getRandomInteger(0,usersId.length-1)]);
+  return temp;
+}
 
 const pressEscape = (evt) => evt.key === 'Escape';
 
-export {getUniqNumber};
-export {getRandomInteger};
-export {pressEscape};
+export {getUniqNumber, getRandomInteger, pressEscape, generateArray};
 
