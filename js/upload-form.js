@@ -1,74 +1,164 @@
-import {uploadHashtagInput, clearHashtagsField, checkFormValidation} from './hashtag.js';
-import {pressEscape} from './util.js';
-import {setScale} from './scaler.js';
-import {setEffects} from './effects.js';
-import {setData} from './api.js';
-import {addPostMessages, showSuccessMessage, closeMessage, showErrorMessage} from './message.js';
 
-const form = document.querySelector('.img-upload__form');
+import { resetEffects } from './effects.js';
+import { resetScale } from './scale.js';
 
-const uploadingControl = form.querySelector('#upload-file');
-const uploadingOverlay = form.querySelector('.img-upload__overlay');
-const uploadingClose = form.querySelector('#upload-cancel');
+const VALID_CHARS = /^#[a-zа-яё0-9]{1,19}$/i;
+const TAG_MAX_COUNT = 5;
 
-const uploadingComments = uploadingOverlay.querySelector('.text__description');
-const uploadingButton = uploadingOverlay.querySelector('#upload-submit');
+const ERROR_MESSAGE = {
+  NOT_UNIQUE: 'Хэштеги не должны повторяться',
+  NOT_VALID: 'Хэштег должен начинаться с # и состоять из букв или цифр',
+  REACHED_MAX_COUNT: 'Максимум 5 хэштегов'
+};
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
-const clearForm = () => {
-  uploadingOverlay.classList.add('hidden');
-  document.querySelector('body').classList.remove('modal-open');
+const body = document.querySelector('body');
+const uploadForm = document.querySelector('.img-upload__form');
+const uploadFile = uploadForm.querySelector('#upload-file');
 
-  uploadingControl.value = '';
-  clearHashtagsField();
-  uploadingComments.value = '';
+const imageOverlay = uploadForm.querySelector('.img-upload__overlay');
+const buttonCloseOverlay = uploadForm.querySelector('#upload-cancel');
 
-  closeMessage();
+const hashtagsField = uploadForm.querySelector('.text__hashtags');
+const commentsField = uploadForm.querySelector('.text__description');
 
-  uploadingButton.disabled = false;
+const imagePreview = uploadForm.querySelector('.img-upload__preview img');
+const filterImagesPreview = uploadForm.querySelector('.effects__preview');
+
+const pristine = new Pristine(uploadForm, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+});
+
+const getSplitTags = (tags) => tags.trim().split(' ').filter((tag) => tag.trim().length);
+
+const areCharsValid = (value) => getSplitTags(value).every((tag) => VALID_CHARS.test(tag));
+
+const hasReachedHashtagLimit = (value) => getSplitTags(value).length <= TAG_MAX_COUNT;
+const areTagsUnique = (value) => {
+  const lowerCaseTags = getSplitTags(value).map((tag) => tag.toLowerCase());
+  return lowerCaseTags.length === new Set(lowerCaseTags).size;
 };
 
-const onEscapeKeyDown = (evt) => {
-  if(pressEscape(evt) && !evt.target.classList.contains('text__hashtags') && !evt.target.classList.contains('text__description')) {
-    clearForm();
+pristine.addValidator(
+  hashtagsField,
+  areCharsValid,
+  ERROR_MESSAGE.NOT_VALID,
+  1,
+  true
+);
 
-    document.removeEventListener('keydown', onEscapeKeyDown);
+pristine.addValidator(
+  hashtagsField,
+  hasReachedHashtagLimit,
+  ERROR_MESSAGE.REACHED_MAX_COUNT,
+  2,
+  true
+);
+
+pristine.addValidator(
+  hashtagsField,
+  areTagsUnique,
+  ERROR_MESSAGE.NOT_UNIQUE,
+  3,
+  true
+);
+
+const reset = () => {
+  uploadForm.reset();
+  pristine.reset();
+  resetScale();
+  resetEffects();
+};
+
+const hideImageModal = () => {
+  imageOverlay.classList.add('hidden');
+  body.classList.remove('modal-open');
+
+  reset();
+  buttonCloseOverlay.removeEventListener('click', hideImageModal);
+};
+
+const documentOnKeydown = (evt) => {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    hideImageModal();
+    document.removeEventListener('keydown', documentOnKeydown);
   }
 };
 
-const closeForm = () => {
-  clearForm();
+const showImageModal = () => {
+  imageOverlay.classList.remove('hidden');
+  body.classList.add('modal-open');
 
-  document.removeEventListener('keydown', onEscapeKeyDown);
+  buttonCloseOverlay.addEventListener('click', hideImageModal);
+  document.addEventListener('keydown', documentOnKeydown);
 };
 
-uploadingClose.addEventListener('click', closeForm);
+commentsField.addEventListener('keydown', (evt) => {
+  if (evt.key === 'Escape') {
+    evt.stopPropagation();
+  }
+});
 
-const onUploadClick = () => {
-  document.addEventListener('keydown', onEscapeKeyDown);
+hashtagsField.addEventListener('keydown', (evt) => {
+  if (evt.key === 'Escape') {
+    evt.stopPropagation();
+  }
+});
 
-  uploadingOverlay.classList.remove('hidden');
-  document.querySelector('body').classList.add('modal-open');
-
-  setScale();
-  setEffects();
-
-  uploadHashtagInput();
+const SubmitBtnText = {
+  IDLE: 'Сохранить',
+  SENDING: 'Сохраняю...'
 };
 
-const uploadForm = () => {
-  uploadingControl.addEventListener('change', onUploadClick);
-  addPostMessages();
+const blockSubmitButton = () => {
+  buttonCloseOverlay.disabled = true;
+  buttonCloseOverlay.textContent = SubmitBtnText.SENDING;
 };
 
-const onFormSubmit = (evt) => {
-  evt.preventDefault();
+const unblockSubmitButton = () => {
+  buttonCloseOverlay.disabled = false;
+  buttonCloseOverlay.textContent = SubmitBtnText.IDLE;
+};
 
-  if(checkFormValidation()) {
-    setData(showSuccessMessage, showErrorMessage, 'POST', new FormData(form));
+const onFormSubmit = (callback) => {
+
+  uploadForm.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+
+    if (pristine.validate()) {
+      blockSubmitButton();
+      await callback(new FormData(uploadForm));
+      unblockSubmitButton();
+    }
+  });
+};
+
+const changeEffectPreviewImage = (loadedImage) => {
+  filterImagesPreview.forEach((preview) => {
+    preview.style.backgroundImage = `url('${loadedImage}')`;
+  });
+};
+
+const showPreviewImage = () => {
+  const file = uploadFile.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const matches = FILE_TYPES.some((fileType) => fileName.endsWith(fileType));
+
+  if (file && matches) {
+    const imageUrl = URL.createObjectURL(file);
+    imagePreview.src = imageUrl;
+    changeEffectPreviewImage(imageUrl);
   }
 };
 
-form.addEventListener('submit', onFormSubmit);
+const onChangeUpload = () => {
+  showImageModal();
+  showPreviewImage();
+};
 
-export{uploadForm, closeForm, onEscapeKeyDown};
+uploadFile.addEventListener('change', onChangeUpload);
 
+export { onFormSubmit, hideImageModal, documentOnKeydown };
