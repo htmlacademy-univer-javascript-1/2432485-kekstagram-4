@@ -1,100 +1,74 @@
-const MAX_MARVIN_VALUE = 100;
-const MAX_PHOBOS_VALUE = 3;
-const MAX_HEAT_VALUE = 3;
-const RELIX = 10;
+import { Effects } from './constants.js';
 
-const Slider = {
-  MIN: 0,
-  MAX: 100,
-  STEP: 1,
-  CONNECT: 'lower'
-};
+const modal = document.querySelector('.img-upload');
 
-const uploadingOverlay = document.querySelector('.img-upload__overlay');
-const uploadingPicture = uploadingOverlay.querySelector('.img-upload__preview').querySelector('img');
-const sliderValue = uploadingOverlay.querySelector('.effect-level__value');
-const sliderItem = uploadingOverlay.querySelector('.effect-level__slider');
-const sliderField = uploadingOverlay.querySelector('.img-upload__effect-level');
-const effectsList = uploadingOverlay.querySelector('.effects__list');
+const imageUpload = modal.querySelector('.img-upload__preview img');
+const slider = modal.querySelector('.img-upload__effect-level');
 
-let currentEffect = '';
+const effects = modal.querySelector('.effects');
+const effectLevelSlider = modal.querySelector('.effect-level__slider');
+const effectLevelValue = modal.querySelector('.effect-level__value');
 
-noUiSlider.create(sliderItem, {
-  range: {
-    min: Slider.MIN,
-    max: Slider.MAX
-  },
-  start: Slider.MAX,
-  step: Slider.STEP,
-  connect: Slider.CONNECT
-});
+let chosenEffect = Effects.NONE;
 
-const getEffectStep = (effectMaxValue) => effectMaxValue / Slider.MAX;
+const updateSlider = () => {
+  effectLevelSlider.noUiSlider.updateOptions(
+    {
+      range: {
+        min: chosenEffect.min,
+        max: chosenEffect.max
+      },
+      step: chosenEffect.step,
+      start: chosenEffect.max
+    });
 
-const effects = {
-  none: () => {
-    sliderField.classList.add('hidden');
-    return 'none';
-  },
-  chrome: () => {
-    sliderField.classList.remove('hidden');
-    return `grayscale(${parseInt(sliderValue.value, RELIX) * getEffectStep(1)})`;
-  },
-  sepia: () => {
-    sliderField.classList.remove('hidden');
-    return `sepia(${parseInt(sliderValue.value, RELIX) * getEffectStep(1)})`;
-  },
-  marvin: () => {
-    sliderField.classList.remove('hidden');
-    return `invert(${parseInt(sliderValue.value, RELIX) * getEffectStep(MAX_MARVIN_VALUE)}%)`;
-  },
-  phobos: () => {
-    sliderField.classList.remove('hidden');
-    return `blur(${parseInt(sliderValue.value, RELIX) * getEffectStep(MAX_PHOBOS_VALUE)}px)`;
-  },
-  heat: () => {
-    sliderField.classList.remove('hidden');
-    const effectMin = Slider.MAX / (MAX_HEAT_VALUE - 1);
-    return `brightness(${(effectMin + parseInt(sliderValue.value, RELIX)) * getEffectStep(MAX_HEAT_VALUE - 1)})`;
+  if (chosenEffect === Effects.NONE) {
+    slider.classList.add('hidden');
+  } else {
+    slider.classList.remove('hidden');
   }
 };
 
-const onSliderChange = () => {
-  sliderValue.value = sliderItem.noUiSlider.get();
+const onEffectsChange = (evt) => {
+  if (!evt.target.classList.contains('effects__radio')) {
+    return;
+  }
 
-  uploadingPicture.style.filter = effects[currentEffect.replace('effects__preview--', '')]();
+  chosenEffect = Effects[`${evt.target.value}`.toUpperCase()];
+  imageUpload.className = `effects__preview--${chosenEffect.name}`;
+  updateSlider();
 };
 
-const onEffectsClick = (evt) => {
-  let element = evt.target;
+const onUpdateSlider = () => {
+  const sliderValue = effectLevelSlider.noUiSlider.get();
 
-  if(element.classList.contains('effects__label')){
-    element = element.querySelector('span');
+  if (chosenEffect === Effects.NONE) {
+    imageUpload.style.filter = Effects.NONE.style;
+    slider.classList.add('hidden');
+  }
+  else {
+    imageUpload.style.filter = `${chosenEffect.style}(${sliderValue}${chosenEffect.unit})`;
   }
 
-  if(element.classList.contains('effects__preview')) {
-    if(currentEffect !== '') {
-      uploadingPicture.classList.remove(currentEffect);
-    }
-
-    sliderItem.noUiSlider.set(Slider.MAX);
-    sliderValue.value = sliderItem.noUiSlider.get();
-
-    currentEffect = element.classList[1];
-    uploadingPicture.classList.add(currentEffect);
-    uploadingPicture.style.filter = effects[currentEffect.replace('effects__preview--', '')]();
-  }
+  effectLevelValue.value = sliderValue;
 };
 
 const resetEffects = () => {
-  currentEffect = 'effects__preview--none';
-
-  uploadingPicture.style.filter = effects.none();
-
-  effectsList.children[0].querySelector('input').checked = true;
+  chosenEffect = Effects.NONE;
+  updateSlider();
 };
 
-sliderItem.noUiSlider.on('change', onSliderChange);
-effectsList.addEventListener('click', onEffectsClick);
+noUiSlider.create(effectLevelSlider, {
+  range: {
+    min: Effects.NONE.min,
+    max: Effects.NONE.max
+  },
+  start: Effects.NONE.max,
+  step: Effects.NONE.step,
+  connect: 'lower'
+});
+
+effects.addEventListener('change', onEffectsChange);
+effectLevelSlider.noUiSlider.on('update', onUpdateSlider);
 
 export { resetEffects };

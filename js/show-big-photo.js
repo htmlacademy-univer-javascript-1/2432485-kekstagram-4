@@ -1,4 +1,4 @@
-import { BigPhotoDetails } from './fill-big-photo-details.js';
+import { fillBigPhotoDetails } from './filling-big-photo-details.js';
 
 const body = document.querySelector('body');
 const bigPhoto = document.querySelector('.big-picture');
@@ -8,7 +8,6 @@ const pictures = document.querySelector('.pictures');
 const hideBigPhoto = () => {
   bigPhoto.classList.add('hidden');
   body.classList.remove('modal-open');
-
   document.removeEventListener('keydown', documentOnKeydown);
   removeButton.removeEventListener('click', hideBigPhoto);
 };
@@ -39,7 +38,7 @@ const showBigPhoto = (photos) => {
 
     const currentPhoto = photos.find((item) => item.id === +clickedThumbnail.dataset.id);
     renderBigPhoto();
-    BigPhotoDetails(currentPhoto);
+    fillBigPhotoDetails(currentPhoto);
   });
 };
 

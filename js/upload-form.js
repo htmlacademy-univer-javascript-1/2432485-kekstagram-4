@@ -1,16 +1,7 @@
 
+import { TAG_MAX_COUNT, VALID_CHARS, ERROR_MESSAGE, FILE_TYPES } from './constants.js';
 import { resetEffects } from './effects.js';
 import { resetScale } from './scale.js';
-
-const VALID_CHARS = /^#[a-zа-яё0-9]{1,19}$/i;
-const TAG_MAX_COUNT = 5;
-
-const ERROR_MESSAGE = {
-  NOT_UNIQUE: 'Хэштеги не должны повторяться',
-  NOT_VALID: 'Хэштег должен начинаться с # и состоять из букв или цифр',
-  REACHED_MAX_COUNT: 'Максимум 5 хэштегов'
-};
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const body = document.querySelector('body');
 const uploadForm = document.querySelector('.img-upload__form');
@@ -35,6 +26,7 @@ const getSplitTags = (tags) => tags.trim().split(' ').filter((tag) => tag.trim()
 const areCharsValid = (value) => getSplitTags(value).every((tag) => VALID_CHARS.test(tag));
 
 const hasReachedHashtagLimit = (value) => getSplitTags(value).length <= TAG_MAX_COUNT;
+
 const areTagsUnique = (value) => {
   const lowerCaseTags = getSplitTags(value).map((tag) => tag.toLowerCase());
   return lowerCaseTags.length === new Set(lowerCaseTags).size;
@@ -123,7 +115,6 @@ const unblockSubmitButton = () => {
 };
 
 const onFormSubmit = (callback) => {
-
   uploadForm.addEventListener('submit', async (evt) => {
     evt.preventDefault();
 
@@ -144,7 +135,6 @@ const changeEffectPreviewImage = (loadedImage) => {
 const showPreviewImage = () => {
   const file = uploadFile.files[0];
   const fileName = file.name.toLowerCase();
-
   const matches = FILE_TYPES.some((fileType) => fileName.endsWith(fileType));
 
   if (file && matches) {
