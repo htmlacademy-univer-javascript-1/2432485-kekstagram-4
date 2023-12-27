@@ -1,4 +1,4 @@
-import { BigPhotoDetails } from './fill-big-photo-details.js';
+import { fillBigPhotoDetails } from './filling-big-photo-details.js';
 
 const body = document.querySelector('body');
 const bigPhoto = document.querySelector('.big-picture');
@@ -29,7 +29,6 @@ function documentOnKeydown(evt) {
 
 const showBigPhoto = (photos) => {
   pictures.addEventListener('click', (evt) => {
-
     const clickedThumbnail = evt.target.closest('[data-id]');
 
     if (!clickedThumbnail) {
@@ -39,7 +38,7 @@ const showBigPhoto = (photos) => {
 
     const currentPhoto = photos.find((item) => item.id === +clickedThumbnail.dataset.id);
     renderBigPhoto();
-    BigPhotoDetails(currentPhoto);
+    fillBigPhotoDetails(currentPhoto);
   });
 };
 

@@ -1,5 +1,4 @@
-const COMMENTS_LOAD_COUNT = 5;
-
+import { COMMENTS_LOAD_COUNT } from './constants.js';
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImg = bigPicture.querySelector('.big-picture__img img');
 const bigPictureLikesCount = bigPicture.querySelector('.likes-count');
@@ -31,10 +30,10 @@ const changeCommentCount = (currentShownCommentsCount, pictureCommentsCount) => 
 
 const showComments = (comments) => {
   commentsList.innerHTML = '';
+
   commentsLoader.classList.remove('hidden');
 
   const fragment = document.createDocumentFragment();
-
   const slicedComments = comments.slice(0, shownCommentsCount);
 
   for (const comment of slicedComments) {
@@ -44,7 +43,6 @@ const showComments = (comments) => {
   if (shownCommentsCount >= comments.length) {
     shownCommentsCount = comments.length;
     commentsLoader.classList.add('hidden');
-
     commentsLoader.removeEventListener('click', commentsLoaderOnClick);
   }
 
@@ -57,19 +55,20 @@ function commentsLoaderOnClick() {
   showComments(currentPhoto.comments);
 }
 
-const BigPhotoDetails = (clickedPhoto) => {
+const fillBigPhotoDetails = (clickedPhoto) => {
   currentPhoto = clickedPhoto;
 
   bigPictureImg.src = clickedPhoto.url;
   bigPictureLikesCount.textContent = clickedPhoto.likes;
   commentsCount.textContent = clickedPhoto.comments.length;
   bigPictureSocialCaption.textContent = clickedPhoto.description;
-  commentsLoader.addEventListener('click', commentsLoaderOnClick);
 
+  commentsLoader.addEventListener('click', commentsLoaderOnClick);
 
   shownCommentsCount = COMMENTS_LOAD_COUNT;
 
   showComments(clickedPhoto.comments);
 };
 
-export { BigPhotoDetails };
+export { fillBigPhotoDetails };
+

@@ -43,3 +43,5 @@ const renderPhotos = (photosInfo) => {
 };
 
 export { renderPhotos };
+
+
