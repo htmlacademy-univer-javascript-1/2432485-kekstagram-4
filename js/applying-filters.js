@@ -1,14 +1,6 @@
-
+import { Filters, PICTURES_COUNT } from './constants.js';
 import { renderPhotos } from './render-miniature.js';
 import { debounce } from './utils.js';
-
-const PICTURES_COUNT = 10;
-
-const Filters = {
-  DEFAULT: 'filter-default',
-  RANDOM: 'filter-random',
-  DISCUSSED: 'filter-discussed',
-};
 
 const filterFormElement = document.querySelector('.img-filters');
 let currentFilter = Filters.DEFAULT;
@@ -37,6 +29,7 @@ const onFilterClick = (callback) => {
 
     const clickedButton = evt.target;
     currentFilter = clickedButton.id;
+
     const currentActiveFilter =
       filterFormElement.querySelector('.img-filters__button--active');
     currentActiveFilter.classList.remove('img-filters__button--active');
@@ -48,6 +41,7 @@ const onFilterClick = (callback) => {
 
 const showFilters = (loadedPhotos) => {
   filterFormElement.classList.remove('img-filters--inactive');
+
   photos = [...loadedPhotos];
 
   const debouncedRender = debounce((newPhotos) => {
