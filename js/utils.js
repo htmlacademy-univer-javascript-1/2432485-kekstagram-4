@@ -38,6 +38,6 @@ const debounce = (callback, timeoutDelay = 500) => {
   };
 };
 
-const throttle = (array) => array.sort(() => Math.random() - 0.5);
+const  throttle = (array) => array.sort(() => Math.random() - 0.5);
 
-export { getRandomNumberFromInterval, getId, throttle, createRandomIdFromRangeGenerator, debounce };
+export { getRandomNumberFromInterval, getId,  throttle, createRandomIdFromRangeGenerator, debounce };

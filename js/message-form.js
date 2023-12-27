@@ -12,7 +12,7 @@ const onCloseErrorMessage = () => {
   }
 };
 
-const onErrorMouseClick = (evt) => {
+const onErrorClick = (evt) => {
   const errorContainer = document.querySelector('.success_button');
   if (evt.target !== errorContainer) {
     onCloseErrorMessage();
@@ -24,7 +24,8 @@ const showErrorMessage = () => {
   message.querySelector('.error__button').addEventListener('click', onCloseErrorMessage);
 
   document.addEventListener('keydown', onEscapeError);
-  document.addEventListener('click', onErrorMouseClick);
+  document.addEventListener('click', onErrorClick);
+
   document.removeEventListener('keydown', documentOnKeydown);
   document.body.append(message);
 };

@@ -2,7 +2,7 @@ import { renderPhotos } from './render-miniature.js';
 import { getData, sendData } from './api.js';
 import { onFormSubmit, hideImageModal } from './upload-form.js';
 import { showErrorMessage, showSuccessMessage } from './message-form.js';
-import { showFilters } from './appyling-filters.js';
+import { showFilters } from './applying-filters.js';
 
 getData().then((data) => {
   renderPhotos(data);
